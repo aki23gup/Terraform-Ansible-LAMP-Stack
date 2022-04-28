@@ -1,13 +1,14 @@
 resource "aws_security_group" "websg" {
   name        = "websg-${terraform.workspace}"
   description = "controls access to the LB"
-  vpc_id      = var.vpc_id
+  vpc_id      = aws_vpc.lamp_vpc.id
   tags = merge(
     {
       "Name" : "websg-${terraform.workspace}"
     }, var.default_tags
   )
 }
+
 
 resource "aws_security_group_rule" "lb_to_web" {
   security_group_id        = aws_security_group.websg.id
@@ -17,6 +18,8 @@ resource "aws_security_group_rule" "lb_to_web" {
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.lbsg.id
 }
+
+
 
 resource "aws_security_group_rule" "debuglaptop" {
   security_group_id = aws_security_group.websg.id
@@ -37,6 +40,7 @@ resource "aws_security_group_rule" "ssh" {
 
 }
 
+
 resource "aws_security_group_rule" "icmp" {
   security_group_id = aws_security_group.websg.id
   type              = "ingress"
@@ -46,6 +50,8 @@ resource "aws_security_group_rule" "icmp" {
   cidr_blocks       = ["${var.personal_laptop_ip}/32"]
 
 }
+
+
 
 resource "aws_security_group_rule" "web_egress" {
   security_group_id = aws_security_group.websg.id

@@ -1,12 +1,8 @@
 resource "aws_security_group" "dbsg" {
   name        = "dbsg-${terraform.workspace}"
   description = "controls access to the LB"
-  vpc_id      = var.vpc_id
-  tags = merge(
-    {
-      "Name" : "dbsg-${terraform.workspace}"
-    }, var.default_tags
-  )
+  vpc_id      = aws_vpc.lamp_vpc.id
+  tags =  { "Name" : "DatabaseSecurityGroup"}
 }
 
 

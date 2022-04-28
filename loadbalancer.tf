@@ -2,15 +2,11 @@ resource "aws_lb" "lampalb" {
   name               = "lamp-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [var.lbsgid]
-  subnets            = var.websubidlb
-
+  security_groups    = [aws_security_group.lbsg.id]
+  subnets            = aws_subnet.websubnets.*.id
   enable_deletion_protection = false
 
-  tags = merge(
-    {
-      "Name" : "alb-${terraform.workspace}"
-  }, var.default_tags)
+  tags = { "Name" : "ApplicationLoadBalancer"}
 }
 
 
@@ -18,7 +14,7 @@ resource "aws_alb_target_group" "lamptg" {
   name        = "lamp-alb-target"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = var.vpc_id
+  vpc_id      = aws_vpc.lamp_vpc.id
   target_type = "instance"
 
   health_check {
@@ -48,10 +44,10 @@ resource "aws_alb_listener" "listener_http" {
 resource "aws_lb_target_group_attachment" "ipattachment" {
   count            = var.az_count
   target_group_arn = aws_alb_target_group.lamptg.arn
-  target_id        = var.lampserverid
+  target_id        = aws_instance.lampsetup[count.index].id
   port             = 80
 }
 
-output "alburl" {
+output "loadbalancerurl" {
   value = aws_lb.lampalb.dns_name
 }

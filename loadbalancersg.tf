@@ -1,12 +1,8 @@
 resource "aws_security_group" "lbsg" {
   name        = "lbsg-${terraform.workspace}"
-  description = "controls access to the LB"
-  vpc_id      = var.vpc_id
-  tags = merge(
-    {
-      "Name" : "lbsg-${terraform.workspace}"
-    }, var.default_tags
-  )
+  description = "Security Group rules for acess to the Load Balancer"
+  vpc_id      = aws_vpc.lamp_vpc.id
+  tags = { "Name" : "LoadBalancerSecurityGroup" }
 }
 
 

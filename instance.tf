@@ -1,16 +1,14 @@
 data "aws_ami" "ubuntu" {
+
   most_recent = true
-  
   filter {
     name   = "name"
     values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
-
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
   }
-
   owners = ["099720109477"]
 }
 
@@ -19,9 +17,9 @@ resource "aws_instance" "lampsetup" {
   count                       = var.az_count
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
-  subnet_id                   = var.websubid
+  subnet_id                   = aws_subnet.websubnets[count.index % var.az_count].id
   key_name                    = var.key_name
-  vpc_security_group_ids      = [var.websgid]
+  vpc_security_group_ids      = [aws_security_group.websg.id]
   associate_public_ip_address = true
 
 
@@ -31,16 +29,14 @@ resource "aws_instance" "lampsetup" {
     encrypted             = true
     volume_type           = "gp2"
 
-    tags = merge({
-      Name = "rootVolume-${count.index}-${terraform.workspace}"
-    }, var.default_tags)
+    tags = {
+      Name = "rootVolume"
+    }
   }
-  user_data = file("installAnsibleUbuntu.sh")
+  user_data = file("ansibleInstall.sh")
 
-
-  tags = merge({
-    Name = "Lamp-${count.index}-${terraform.workspace}"
-  }, var.default_tags)
+  tags = {
+    Name = "LampInstance"
+  }
 }
- 
  
