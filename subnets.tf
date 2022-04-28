@@ -1,3 +1,4 @@
+//Deploying Subnets in the VPC
 
 resource "aws_subnet" "websubnets" {
   count                = var.az_count
@@ -13,7 +14,6 @@ resource "aws_subnet" "dbsubnets" {
   vpc_id               = aws_vpc.lamp_vpc.id
   cidr_block           = cidrsubnet(aws_vpc.lamp_vpc.cidr_block, 2, count.index + 2)
   availability_zone_id = data.aws_availability_zones.available.zone_ids[count.index]
-
   tags = {"Name" : "DatabaseSubnet"}
 
 }

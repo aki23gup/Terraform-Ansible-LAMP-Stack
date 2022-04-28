@@ -1,11 +1,11 @@
-#The Region you want to deploy the infra
+// Region 
 aws_region         = "us-east-1"
 
-# Replace the VPC cidr from your account. Range of CIDR max(22)
+// VPC CIDR
 vpc_cidr           = "10.0.0.0/16"
 
-# Key pair name create in same region
+//.PEM Private Key File
 key_name           = "lamp"
 
-# personal laptop public ip for debugging and SSH purpose
+# Laptop IP Address for SSH Security Group
 personal_laptop_ip = "99.235.109.84"

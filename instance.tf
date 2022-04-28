@@ -1,5 +1,7 @@
-data "aws_ami" "ubuntu" {
+# This file installs our LAMP instances 
 
+// Data Block to retrieve latest AMI Ubuntu Image
+data "aws_ami" "ubuntu" {
   most_recent = true
   filter {
     name   = "name"
@@ -12,12 +14,12 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"]
 }
 
-
+// Deploy EC2 Instance
 resource "aws_instance" "lampsetup" {
-  count                       = var.az_count
+  count                       = var.az_count //Deploy in 2 Availability Zones
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
-  subnet_id                   = aws_subnet.websubnets[count.index % var.az_count].id
+  subnet_id                   = aws_subnet.websubnets[count.index % var.az_count].id //Deploy in 2 Subnets
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.websg.id]
   associate_public_ip_address = true
@@ -33,7 +35,8 @@ resource "aws_instance" "lampsetup" {
       Name = "rootVolume"
     }
   }
-  user_data = file("ansibleInstall.sh")
+  // Use the shell file called "ansibleInstall" as a bootstrap in the instance
+  user_data = file("ansibleInstall.sh") 
 
   tags = {
     Name = "LampInstance"

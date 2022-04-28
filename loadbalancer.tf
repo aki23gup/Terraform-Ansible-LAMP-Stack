@@ -1,3 +1,5 @@
+// This file deploys the application load balancer
+
 resource "aws_lb" "lampalb" {
   name               = "lamp-alb"
   internal           = false
@@ -9,7 +11,7 @@ resource "aws_lb" "lampalb" {
   tags = { "Name" : "ApplicationLoadBalancer"}
 }
 
-
+// Pick and deploy target group for the loadbalancer
 resource "aws_alb_target_group" "lamptg" {
   name        = "lamp-alb-target"
   port        = 80
@@ -17,7 +19,7 @@ resource "aws_alb_target_group" "lamptg" {
   vpc_id      = aws_vpc.lamp_vpc.id
   target_type = "instance"
 
-  health_check {
+  health_check { // health check parameters for the load balancer
     enabled             = true
     healthy_threshold   = 3
     interval            = 30
@@ -30,6 +32,7 @@ resource "aws_alb_target_group" "lamptg" {
   }
 }
 
+// Deploy an HTTP Listener
 resource "aws_alb_listener" "listener_http" {
   load_balancer_arn = aws_lb.lampalb.arn
   port              = "80"
@@ -48,6 +51,7 @@ resource "aws_lb_target_group_attachment" "ipattachment" {
   port             = 80
 }
 
+// Once Loadbalancer is deployed, an output is produced to provide URL of the loadbalancer
 output "loadbalancerurl" {
   value = aws_lb.lampalb.dns_name
 }
